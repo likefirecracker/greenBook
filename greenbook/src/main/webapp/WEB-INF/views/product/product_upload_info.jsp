@@ -95,8 +95,21 @@
              max-width: 1200px;
              margin: 0 auto;
         }
+        .boxes{width: 95%;
+            background-color: rgba(150, 200, 255, 0.3);
+            padding: 10px;
+            margin: 10px;
+            border-radius: 1em;
+            margin: 10px auto;
+        }
     </style>
     <script>
+        $(document).ready(function (e){
+            $("#preview_image").on("click",function (){
+                $("input[name=imgfile]").click();
+            })
+        })
+
         const showValue = (target) => {
             const value = target.value;
             const text =  target.options[target.selectedIndex].text;
@@ -109,24 +122,45 @@
                     "<option value='경제/경영'>경제/경영</option>"+"<option value='자기계발'>자기계발</option>"
             }
         }
+
+        function registerCheck(){
+            let bookTitle = $("input[name=bookTitle]").val();
+            let bookAuthor = $("input[name=bookAuthor]").val();
+            let bookPublisher = $("input[name=bookPublisher]").val();
+            let bookPrice = $("input[name=bookPrice]").val();
+            let publicationDate = $("input[name=publicationDate]").val();
+            let bookDescription = $("textarea[name=bookDescription]").val();
+            let imgSrc = $("#preview_image").attr("src");
+
+            if (bookTitle == ""){alert("제목을 입력해주세요");}
+            else if (bookAuthor == ""){alert("저자를 입력해주세요.");}
+            else if (bookPublisher == ""){alert("출판사를 입력해주세요.");}
+            else if (bookPrice == ""){alert("가격을 입력해주세요.");}
+            else if (publicationDate == ""){alert("발행일을 입력해주세요.");}
+            else if (bookDescription == ""){alert("책 내용을 입력해주세요.");}
+            else if (imgSrc == "https://via.placeholder.com/100x150"){alert("책 이미지를 넣어주세요.");}
+            else{$("#register").submit();}
+        }
     </script>
 </head>
 <body>
-<div style="margin: 10px;">
+<div  class="boxes">
     <h3>상품 등록</h3>
-    <form method="post" action="product_uploadOk" enctype="multipart/form-data">
+    <form id="register" method="post" action="product_uploadOk" enctype="multipart/form-data">
         <table class="table table-bordered" style="table-layout: fixed; background-color: #f7f7f7;">
             <tr>
                 <td rowspan="8">
-                    <input type="file" accept="image/*" name="imgfile" id="image" onchange="thumbNail(event)">
+                    <input style="display: none" type="file" accept="image/*" name="imgfile" id="image" onchange="thumbNail(event)">
                     <div id="image_container">
                         <img src="https://via.placeholder.com/100x150" alt="" id="preview_image">
+                        <input type="hidden" value="" name="imgSrc">
                     </div>
                 </td>
                 <td>상품명</td>
                 <td colspan="3">
                     <input type="text" name="bookTitle" size="50" placeholder="상품명">
-                    <input type="hidden" name="member_id" value="">
+                    <input type="hidden" name="member_id">
+                    <input type="hidden" name="isbn">
                 </td>
             </tr>
             <tr>
@@ -189,11 +223,11 @@
                     <td>책 상태</td>
                     <td>
                         <select name="bookStatus">
-                            <option value="1">아주 나쁨</option>
-                            <option value="3">나쁨</option>
-                            <option value="5">양호</option>
-                            <option value="7">좋음</option>
                             <option value="9">아주 좋음</option>
+                            <option value="7">좋음</option>
+                            <option value="5">양호</option>
+                            <option value="3">나쁨</option>
+                            <option value="1">아주 나쁨</option>
                         </select>
                     </td>
                 </c:if>
@@ -212,10 +246,30 @@
             </tr>
         </table>
         <div style="text-align: center;">
-            <input type="submit" name="" id="" value="등록" class="btn btn-secondary">
+            <input type="button" name="" id="" value="등록" class="btn btn-secondary" onclick="registerCheck()">
         </div>
     </form>
 </div>
+<div class="boxes">
+    <input type="text" id="searchText">
+    <input type="button" value="검색" onclick="bookList()" class="search">
+    <input type="hidden" value="1" id="currentPage">
 
+    <table class="tables table table-light">
+        <tr class="firstRow">
+            <td>이미지</td>
+            <td>제목</td>
+            <td>저자</td>
+            <td>출판사</td>
+            <td>역자</td>
+            <td>가격</td>
+            <td>출판일</td>
+            <td>등록</td>
+        </tr>
+    </table>
+
+    <ul id="listPage" style="display: flex; list-style: none"></ul>
+</div>
+<script src="/js/bookListKakao.js?ver=1.1"></script>
 </body>
 </html>

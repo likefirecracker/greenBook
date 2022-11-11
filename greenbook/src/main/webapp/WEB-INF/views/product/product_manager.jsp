@@ -58,19 +58,14 @@
   <c:if test="${bookInfo2.bookId != null}">
     <div class="boxes">
       <form method="post"
-              <c:if test="${sessionScope.get('member_class')== 1}">
-                action = "product_upload"
-              </c:if>
-              <c:if test="${sessionScope.get('member_class')!=1}">
-                action="product_update"
-              </c:if>
+            action="product_update"
             enctype="multipart/form-data">
         <table class="table table-bordered" style="table-layout: fixed; background-color: #f7f7f7;">
           <tr>
             <td rowspan="8">
               <input type="file" accept="image/*" name="imgfile" id="image" onchange="thumbNail(event)">
               <div id="image_container">
-                <img src="/upload/${bookImg2.storedThumbnail}" alt="" id="preview_image" style="width: 100%;">
+                <img src="${bookImg2.storedThumbnail}" alt="" id="preview_image" style="width: 100%;">
               </div>
             </td>
             <td>상품명</td>
@@ -185,7 +180,6 @@
           <input type="submit" class="btn btn-outline-secondary" id="button-addon2" value="검색">
         </div>
       </form>
-      검색기능, 카테고리기능, 배송조회
       <table class="table table-bordered">
         <tr class="table-info">
           <td>이미지</td>
@@ -202,7 +196,7 @@
         <c:forEach items="${bookInfoList}" var="bookInfo" varStatus="status">
           <tr class="table-light">
             <td>
-              <img src="upload/${bookImgList[status.index].storedThumbnail}" width="100px" height="150px">
+              <img src="/upload/${bookImgList[status.index].storedThumbnail}" width="100px" height="150px">
             </td>
             <td>
                 ${bookInfo.bookId}
