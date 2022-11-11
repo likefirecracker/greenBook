@@ -115,25 +115,25 @@
     <!-- 테이블의 컬럼과 DTO의 변수가 이름이 다를 경우 둘을 이어준다. -->
     <!-- Mapping Start -->
     <resultMap id="bookInfoMap" type="com.project.greenbook.dto.BookInfoDTO">
-        <result column="book_id" property="bookId"></result>
-        <result column="book_title" property="bookTitle"></result>
-        <result column="large_category" property="largeCategory"></result>
-        <result column="small_category" property="smallCategory"></result>
-        <result column="book_price" property="bookPrice"></result>
-        <result column="book_author" property="bookAuthor"></result>
-        <result column="book_publisher" property="bookPublisher"></result>
-        <result column="publication_date" property="publicationDate"></result>
-        <result column="book_description" property="bookDescription"></result>
-        <result column="book_stock" property="bookStock"></result>
-        <result column="new_book" property="newBook"></result>
+        <result column="book_id" property="bookId"/>
+        <result column="book_title" property="bookTitle"/>
+        <result column="large_category" property="largeCategory"/>
+        <result column="small_category" property="smallCategory"/>
+        <result column="book_price" property="bookPrice"/>
+        <result column="book_author" property="bookAuthor"/>
+        <result column="book_publisher" property="bookPublisher"/>
+        <result column="publication_date" property="publicationDate"/>
+        <result column="book_description" property="bookDescription"/>
+        <result column="book_stock" property="bookStock"/>
+        <result column="new_book" property="newBook"/>
     </resultMap>
 
     <resultMap id="bookImgMap" type="com.project.greenbook.dto.BookImgDTO">
-        <result column="book_id" property="bookId"></result>
-        <result column="origin_file_name" property="originFileName"></result>
-        <result column="stored_file_name" property="storedFileName"></result>
-        <result column="stored_thumbnail" property="storedThumbnail"></result>
-        <result column="file_size" property="fileSize"></result>
+        <result column="book_id" property="bookId"/>
+        <result column="origin_file_name" property="originFileName"/>
+        <result column="stored_file_name" property="storedFileName"/>
+        <result column="stored_thumbnail" property="storedThumbnail"/>
+        <result column="file_size" property="fileSize"/>
     </resultMap>
     <!-- Mapping End -->
 
