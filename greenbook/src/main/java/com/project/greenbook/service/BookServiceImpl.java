@@ -7,6 +7,7 @@ import com.project.greenbook.dto.BookInfoDTO;
 import com.project.greenbook.dto.Refund;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,9 +16,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
@@ -25,8 +29,14 @@ import java.util.UUID;
 
 @Service
 public class BookServiceImpl implements BookService {
+    private JdbcTemplate jdbcTemplate;
     @Autowired
     private SqlSession sqlSession;
+
+    @Autowired
+    public void setDataSource(DataSource dataSource){
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
+    }
 
     @Override
     public String randomBookId(int randomNum){
@@ -119,8 +129,8 @@ public List bookId1() {
      * */
     @Override
     @Transactional
-    public void register(MultipartFile uploadFile, HttpServletRequest request, HashMap<String, String> param) {
-        System.out.println("========BookServiceImpl.register() start");
+    public void registerMulti(MultipartFile uploadFile, HttpServletRequest request, HashMap<String, String> param) {
+        System.out.println("========BookServiceImpl.registerMulti() start");
 
         UUID uuid = UUID.randomUUID();
 
@@ -168,20 +178,127 @@ public List bookId1() {
 
             e.printStackTrace();
         }
-        //<<<<==================== 여기 수정 2022-11-03=======================================
-        //try 문에서 밖으로 빠져나옴
 
         BookDAO dao = sqlSession.getMapper(BookDAO.class);
 
         dao.register(param);
         param.put("bookId",String.valueOf(dao.getMaxId()));
-        dao.registerUsed(param);// => 추가됨.
+        dao.registerUsed(param);
 
         dao.registerImg(param);
 
-        //=============================================================================>>>>
-        System.out.println("========BookServiceImpl.register() end");
+        System.out.println("========BookServiceImpl.registerMulti() end");
     }
+
+    @Override
+    @Transactional
+    public void registerUrl(HttpServletRequest request, HashMap<String, String> param) {
+        System.out.println("========BookServiceImpl.registerUrl() start");
+
+        UUID uuid = UUID.randomUUID();
+
+        try {
+            URL url = new URL(param.get("imgSrc"));
+            InputStream in = new BufferedInputStream(url.openStream());
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            byte[] buf = new byte[1024];
+            int n = 0;
+            while(-1!=(n=in.read(buf))){
+                out.write(buf,0,n);
+            }
+            out.close();
+            in.close();
+            byte[] response = out.toByteArray();
+
+            String fileName = param.get("isbn")+"jpg";
+            String filePath = request.getSession().getServletContext().getRealPath("/resources/upload/");
+
+
+
+            String storedFileName = uuid + "_" + fileName;
+            String thumbNailName = "s_"+storedFileName;
+
+
+            System.out.println("@#@#@#@#@#@ 여기222");
+            System.out.println("fileName = "+fileName);
+            System.out.println("storedFileName = "+storedFileName);
+
+            //원하는 경로에 이미지 다운ㄹ도ㅡ
+            File fileData = new File(filePath,storedFileName);
+            if(!fileData.exists()) {//해당 경로에 동일한 파일이 존재하지 않으면
+                FileOutputStream fos = new FileOutputStream(filePath+storedFileName);
+                fos.write(response);
+
+                fos.close();
+            }
+            BufferedImage bo_img = ImageIO.read(fileData);
+            int width = 200;
+            int height = 300;
+
+            File thumbNailFile = new File(filePath +"s_"+ storedFileName);
+            BufferedImage bt_img = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
+            Graphics2D graphics = bt_img.createGraphics();
+            graphics.drawImage(bo_img,0,0,width,height,null);
+            ImageIO.write(bt_img,"jpg", thumbNailFile);
+
+
+            param.put("originFileName",fileName);
+            param.put("storedFileName", storedFileName);
+            param.put("storedThumbnail",thumbNailName);
+            param.put("fileSize", "0");
+
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        BookDAO dao = sqlSession.getMapper(BookDAO.class);
+
+        dao.register(param);
+        param.put("bookId",String.valueOf(dao.getMaxId()));
+        dao.registerUsed(param);
+
+        dao.registerImg(param);
+
+        System.out.println("========BookServiceImpl.registerUrl() end");
+
+//        try{
+//            File saveFile = new File(filePath + storedFileName);
+//            System.out.println(saveFile.getName());
+//            uploadFile.transferTo(saveFile);
+//            System.out.println("이미지 파일 저장 완료");
+//
+//
+//            BufferedImage bo_img = ImageIO.read(saveFile);
+//
+//            int width = 200;
+//            int height = 300;
+//
+//            BufferedImage btImg = new BufferedImage(width,height,BufferedImage.TYPE_3BYTE_BGR);
+//            Graphics2D graphic = btImg.createGraphics();
+//            graphic.drawImage(bo_img,0,0, width,height,null);
+//            ImageIO.write(btImg,"jpg", thumbNailFile);
+//
+//            //여기 있는 것을 아래로 이동시킴.
+//
+//        }catch (Exception e){
+//
+//            e.printStackTrace();
+//        }
+//
+//        BookDAO dao = sqlSession.getMapper(BookDAO.class);
+//
+//        dao.register(param);
+//        param.put("bookId",String.valueOf(dao.getMaxId()));
+//        dao.registerUsed(param);
+//
+//        dao.registerImg(param);
+//
+//        System.out.println("========BookServiceImpl.registerUrl() end");
+    }
+
+
 
     public void receiving(HashMap<String,String> param){
         System.out.println("========BookServiceImpl.receiving() start");
@@ -329,13 +446,9 @@ public List bookId1() {
 
             e.printStackTrace();
         }
-        //==================== 2022-11-03 여기 수정 =======================
-        //위에서 아래로 이동, try 문 밖으로 빠져나옴
         BookDAO dao = sqlSession.getMapper(BookDAO.class);
         dao.updateInfo(param);
         dao.updateImg(param);
-
-        //===================================================================
 
         System.out.println("========BookServiceImpl.updateInfoAndImg() end");
     }

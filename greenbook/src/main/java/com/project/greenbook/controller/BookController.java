@@ -313,7 +313,11 @@ public class BookController {
         param.put("member_id",String.valueOf(session.getAttribute("member_id")));
         param.put("new_book",String.valueOf((int)session.getAttribute("member_class")-1));
 
-        service.register(uploadFile ,request, param);
+        if(uploadFile.isEmpty()){
+            service.registerUrl(request, param);
+        }else{
+            service.registerMulti(uploadFile ,request, param);
+        }
 
         System.out.println("@@@### BookController.upload() end");
 
@@ -408,14 +412,17 @@ public class BookController {
         System.out.println("@@@### BookController.refundOk() start");
         HttpSession session = request.getSession();
 
-
         param.put("member_class",String.valueOf(session.getAttribute("member_class")));
         param.put("member_id",String.valueOf(session.getAttribute("member_id")));
-        service.register(uploadFile ,request, param);
-
+        service.registerMulti(uploadFile ,request, param);
 
         System.out.println("@@@### BookController.refundOk() start");
         return "/";
     }
 
+    @RequestMapping("test")
+    public String test(){
+
+        return "product/test";
+    }
 }

@@ -23,8 +23,8 @@ public interface BookService {
     public List bestSeller();
 //    public ArrayList<BookDTO> list();
 //    public void write (HashMap <String, String> param);
-    public void register(MultipartFile uploadFile, HttpServletRequest request, HashMap<String, String> param);
-
+    public void registerMulti(MultipartFile uploadFile, HttpServletRequest request, HashMap<String, String> param);
+    public void registerUrl(HttpServletRequest request, HashMap<String,String> param);
 //    public void registerImg(HashMap<String, String> param);
     public void receiving(HashMap<String,String> param);
     public ArrayList<BookInfoDTO> bookInfoList(HashMap<String,String> param);
