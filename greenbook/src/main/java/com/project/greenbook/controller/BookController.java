@@ -340,10 +340,12 @@ public class BookController {
     public String productUpdate(@RequestParam("imgfile")MultipartFile uploadFile, HttpServletRequest request,@RequestParam HashMap<String, String> param){
         System.out.println("@@@### BookController.upload() start");
 
-        if(uploadFile.getName() == null){
+        if(uploadFile.getSize() == 0){
             service.updateInfo(param);
+            System.out.println("#################################    null입니다");
         }else{
             service.updateInfoAndImg(uploadFile,request,param);
+            System.out.println("#################################     null이 아닙니다");
         }
 
         System.out.println("@@@### BookController.upload() end");
